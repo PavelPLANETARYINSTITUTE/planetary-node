@@ -264,35 +264,31 @@ Connecting to global swarm...</div>
     </div>
 
     <script>
-        // Инициализация локальных переменных и элементов интерфейса
         let ci = 0.000000;
         const ciDisplay = document.getElementById('ci-display');
         const logDisplay = document.getElementById('log-display');
 
-        // Имитация динамического начисления Индекса Вклада (CI)
-        setInterval(() => {
-            ci += 0.000100;
-            ciDisplay.innerText = ci.toFixed(6);
-        }, 1000);
-
-        // Функция логирования событий в локальный терминал
+        // Функция вывода логов в локальный терминал интерфейса
         function addLog(message) {
             const timestamp = new Date().toLocaleTimeString();
             logDisplay.innerText += `\n[${timestamp}] ${message}`;
             logDisplay.scrollTop = logDisplay.scrollHeight;
         }
 
-        // Запрос реального статуса ноды со встроенного API бэкенда (app/api.py)
-        async function fetchNodeStatus() {
-            try {
-                const response = await fetch('/api/v1/node/status');
-                if (response.ok) {
-                    const data = await response.json();
-                    document.getElementById('node-id').innerText = data.node_id;
-                    document.getElementById('network-type').innerText = data.network_type;
-                    document.getElementById('peers-count').innerText = data.peers_connected + " nodes";
+        // РЕАЛИЗАЦИЯ LOCALSTORAGE ДЛЯ ZK-ID УЗЛА
+        function initializeZkIdentity(backendNodeId) {
+            const savedId = localStorage.getItem('pi_node_zk_id');
+            const nodeIdElement = document.getElementById('node-id');
+            
+            if (savedId) {
+                // Если ключ уже сохранен в браузере, используем его
+                nodeIdElement.innerText = savedId;
+                addLog(`Security-Core: Обнаружен сохраненный ZK-ID: ${savedId}. Сессия восстановлена.`);
+            } else {
+                // Если запускается впервые, генерируем или берем с бэкенда и сохраняем
+                const secureId = backendNodeId || `PI-${Math.floor(100 + Math.random() * 900)}-ALPHA`;
+                localStorage.setItem('pi_node_zk_id', secureId);
+                nodeIdElement.innerText = secureId;
 
-        }, 5000);
-    </script>
 </body>
 </html>
