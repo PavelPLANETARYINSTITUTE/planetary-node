@@ -13,6 +13,7 @@
             --accent-blue: #0072ff;
             --accent-green: #00e676;
             --accent-yellow: #ffd600;
+            --accent-red: #ff1744;
             --border-color: #1e2235;
         }
 
@@ -25,7 +26,7 @@
         body {
             background-color: var(--bg-color);
             color: var(--text-color);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             font-size: 14px;
             line-height: 1.5;
             padding: 20px;
@@ -83,6 +84,7 @@
             border: 1px solid var(--border-color);
             border-radius: 6px;
             padding: 20px;
+            margin-bottom: 20px;
         }
 
         .panel h2 {
@@ -128,37 +130,47 @@
             margin: 10px 0;
         }
 
-        .reper-card {
-            background: rgba(30, 34, 53, 0.3);
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            color: var(--text-muted);
+            font-family: monospace;
+            margin-bottom: 5px;
+        }
+
+        .form-control {
+            width: 100%;
+            background-color: #020204;
             border: 1px solid var(--border-color);
             border-radius: 4px;
-            padding: 12px;
-            margin-bottom: 12px;
+            color: var(--text-color);
+            padding: 10px;
+            font-family: inherit;
         }
 
-        .reper-header {
-            display: flex;
-            justify-content: space-between;
-            font-weight: bold;
+        .form-control:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+        }
+
+        .btn-submit {
+            background-color: var(--accent-blue);
+            color: #ffffff;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 20px;
             font-family: monospace;
-            margin-bottom: 6px;
-        }
-
-        .reper-status-active { color: var(--accent-blue); }
-        .reper-status-warning { color: var(--accent-yellow); }
-
-        .progress-bar-bg {
-            background: var(--border-color);
-            height: 6px;
-            border-radius: 3px;
+            font-weight: bold;
+            cursor: pointer;
             width: 100%;
-            overflow: hidden;
-            margin-top: 8px;
+            text-transform: uppercase;
         }
 
-        .progress-bar-fill {
-            height: 100%;
-            background: var(--accent-blue);
+        .btn-submit:hover {
+            background-color: #0056b3;
         }
 
         .terminal-log {
@@ -173,6 +185,16 @@
             overflow-y: auto;
             white-space: pre-wrap;
         }
+
+        .report-box {
+            background: rgba(0, 114, 255, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 15px;
+            margin-top: 15px;
+            display: none;
+            font-family: monospace;
+        }
     </style>
 </head>
 <body>
@@ -183,20 +205,20 @@
             <span>Node Core Control Platform v0.1-alpha</span>
         </div>
         <div class="system-status">
-            <span>NETWORK SYSTEM: ONLINE</span>
+            <span id="net-status-text">NETWORK SYSTEM: CONNECTING</span>
         </div>
     </header>
 
     <div class="grid-container">
-        <!-- Левая колонка: Статус Ноды -->
+        <!-- Левая колонка: Статус Ноды и Вклад -->
         <div class="space-column">
-            <div class="panel" style="margin-bottom: 20px;">
+            <div class="panel">
                 <h2>Спецификация Узла</h2>
                 <ul class="meta-list">
-                    <li><span class="label">Идентификатор (ZK-ID)</span><span class="value" style="color:var(--accent-blue);">PI-883-ALPHA</span></li>
-                    <li><span class="label">Тип сети</span><span class="value">Web4 P2P (Hydra)</span></li>
-                    <li><span class="label">Активные пиры (Сварм)</span><span class="value">142 nodes</span></li>
-                    <li><span class="label">Выделенная память</span><span class="value">2.0 GB</span></li>
+                    <li><span class="label">Идентификатор (ZK-ID)</span><span class="value" id="node-id" style="color:var(--accent-blue);">---</span></li>
+                    <li><span class="label">Тип сети</span><span class="value" id="network-type">---</span></li>
+                    <li><span class="label">Активные пиры (Сварм)</span><span class="value" id="peers-count">---</span></li>
+                    <li><span class="label">Выделенная память</span><span class="value" id="mem-allocated">---</span></li>
                 </ul>
             </div>
 
@@ -208,36 +230,27 @@
             </div>
         </div>
 
-        <!-- Правая колонка: Мониторинг Реперов и Вычислений -->
+        <!-- Правая колонка: Форма подачи проектов и Журнал ядра ИИ -->
         <div class="main-column">
-            <div class="panel" style="margin-bottom: 20px;">
-                <h2>Текущие глобальные реперы в обработке</h2>
-                
-                <div class="reper-card">
-                    <div class="reper-header">
-                        <span>РЕПЕР 1: Агро-Экологический контур (Почва)</span>
-                        <span class="reper-status-active">АКТИВЕН</span>
+            <div class="panel">
+                <h2>Отправить проект в Базу Открытий (Анализ ИИ)</h2>
+                <form id="project-form">
+                    <div class="form-group">
+                        <label for="proj-title">Название научного проекта / Идеи</label>
+                        <input type="text" id="proj-title" class="form-control" required placeholder="Например: Каскадные фильтры микропластика">
                     </div>
-                    <div style="font-size: 12px; color: var(--text-muted);">Расчет биомиметического контура регенерации гумусового слоя.</div>
-                    <div class="progress-bar-bg"><div class="progress-bar-fill" style="width: 33%;"></div></div>
-                </div>
+                    <div class="form-group">
+                        <label for="proj-text">Математическое или физическое описание сути проекта</label>
+                        <textarea id="proj-text" class="form-control" rows="5" required placeholder="Опишите фундаментальные законы, формулы или алгоритмы вашей модели..."></textarea>
+                    </div>
+                    <button type="submit" class="btn-submit">Запустить экспресс-анализ ИИ</button>
+                </form>
 
-                <div class="reper-card">
-                    <div class="reper-header">
-                        <span>РЕПЕР 2: Энергетический контур (Хранение энергии)</span>
-                        <span class="reper-status-active">АКТИВЕН</span>
-                    </div>
-                    <div style="font-size: 12px; color: var(--text-muted);">Моделирование структуры не-литиевых молекулярных решеток (Na-Ion).</div>
-                    <div class="progress-bar-bg"><div class="progress-bar-fill" style="width: 14%;"></div></div>
-                </div>
-
-                <div class="reper-card">
-                    <div class="reper-header">
-                        <span>РЕПЕР 3: Гидро-Океанический контур (Микропластик)</span>
-                        <span class="reper-status-warning">КАЛИБРОВКА</span>
-                    </div>
-                    <div style="font-size: 12px; color: var(--text-muted);">Анализ тождественности уравнений Навье-Стокса процессам биофильтрации.</div>
-                    <div class="progress-bar-bg"><div class="progress-bar-fill" style="width: 5%; background: var(--accent-yellow);"></div></div>
+                <div id="ai-report" class="report-box">
+                    <div style="font-weight: bold; margin-bottom: 5px; text-transform: uppercase;" id="report-status"></div>
+                    <div id="report-disciplines" style="color: var(--accent-yellow); margin-bottom: 5px;"></div>
+                    <div id="report-synergies" style="color: var(--text-color); margin-bottom: 5px;"></div>
+                    <div id="report-log" style="color: var(--text-muted); font-size: 12px;"></div>
                 </div>
             </div>
 
@@ -245,35 +258,40 @@
                 <h2>Журнал вычислений ядра ИИ (AI-Core Log)</h2>
                 <div class="terminal-log" id="log-display">Initializing node kernel...
 Post-quantum cryptographic key loaded.
-Connection established with global swarm.
-AI-Core: loaded requirements.txt constraints.
-Core Filter: validation loop active...</div>
+Connecting to global swarm...</div>
             </div>
         </div>
     </div>
 
     <script>
-        // Демонстрационный скрипт симуляции динамики начисления CI и логов
+        // Инициализация локальных переменных и элементов интерфейса
         let ci = 0.000000;
         const ciDisplay = document.getElementById('ci-display');
         const logDisplay = document.getElementById('log-display');
 
+        // Имитация динамического начисления Индекса Вклада (CI)
         setInterval(() => {
             ci += 0.000100;
             ciDisplay.innerText = ci.toFixed(6);
         }, 1000);
 
-        const mockLogs = [
-            "AI-Core: Проект #7409 распределен в категории [Органическая химия], [Микробиология].",
-            "P2P-Engine: Синхронизировано 4 новых шарда Базы Открытий.",
-            "AI-Core: Обнаружена междисциплинарная тождественность в уравнениях фильтрации.",
-            "Proof-of-Science: Вычислительный блок для Репера 2 успешно проверен и отправлен в сеть."
-        ];
-
-        setInterval(() => {
-            const randomLog = mockLogs[Math.floor(Math.random() * mockLogs.length)];
-            logDisplay.innerText += `\n[${new Date().toLocaleTimeString()}] ${randomLog}`;
+        // Функция логирования событий в локальный терминал
+        function addLog(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            logDisplay.innerText += `\n[${timestamp}] ${message}`;
             logDisplay.scrollTop = logDisplay.scrollHeight;
+        }
+
+        // Запрос реального статуса ноды со встроенного API бэкенда (app/api.py)
+        async function fetchNodeStatus() {
+            try {
+                const response = await fetch('/api/v1/node/status');
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('node-id').innerText = data.node_id;
+                    document.getElementById('network-type').innerText = data.network_type;
+                    document.getElementById('peers-count').innerText = data.peers_connected + " nodes";
+
         }, 5000);
     </script>
 </body>
