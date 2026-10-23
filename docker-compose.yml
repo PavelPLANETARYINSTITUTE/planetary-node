@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  planetary-node:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: planetary_node_core
+    restart: unless-stopped
+    
+    # Открытие портов для интеграции в общую P2P-сеть и локального управления
+    ports:
+      - "4001:4001"   # Сварм-порт IPFS для обмена зашифрованными данными (Протокол Гидра)
+      - "8080:8080"   # Локальный веб-интерфейс управления для оператора
+      
+    # Монтирование томов для сохранения Базы Открытий при перезапуске контейнера
+    volumes:
+      - planetary_storage:/data/pi
+      
+    # Ограничение ресурсов, чтобы нода работала в фоновом режиме и не перегружала систему хоста
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+          
+    # Изоляция сетевого контура
+    networks:
+      - planetary_network
+
+volumes:
+  planetary_storage:
+    name: pi_node_secure_volumes
+
+networks:
+  planetary_network:
+    name: pi_secure_net
