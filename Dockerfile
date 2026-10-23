@@ -11,15 +11,21 @@ RUN apk update && apk add --no-cache \
     openssl \
     ca-certificates
 
-# Создание изолированных директорий для зашифрованной Базы Открытий Планетарного Института
-RUN mkdir -p /data/pi/db /data/pi/node_config /app
+# Создание изолированных директорий для зашифрованной Базы Открытий и приложения
+RUN mkdir -p /data/pi/db /data/pi/node_config /app /app/scripts
 
 # Установка рабочей директории
 WORKDIR /app
 
-# Настройка прав доступа и полная изоляция (запуск от имени несистемного пользователя)
+# Настройка прав доступа и полная изоляция (создание несистемного пользователя)
 RUN adduser -D -u 10001 pi_operator && \
     chown -R pi_operator:pi_operator /data/pi /app
+
+# Копируем скрипт приветствия в изолированную директорию контейнера
+COPY --chown=pi_operator:pi_operator scripts/welcome_msg.sh /app/scripts/welcome_msg.sh
+
+# Делаем скрипт исполняемым
+RUN chmod +x /app/scripts/welcome_msg.sh
 
 USER pi_operator
 
@@ -30,5 +36,5 @@ RUN ipfs init --profile low-power
 EXPOSE 4001
 EXPOSE 8080
 
-# Команда для старта демона децентрализованной сети при запуске ноды
-ENTRYPOINT ["ipfs", "daemon", "--migrate=true"]
+# Точка входа: запуск приветственного сообщения ИИ и Павла, затем старт P2P-демона
+ENTRYPOINT ["/bin/bash", "-c", "/app/scripts/welcome_msg.sh && ipfs daemon --migrate=true"]
