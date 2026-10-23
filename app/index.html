@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PLANETARY INSTITUTE | Node Dashboard</title>
+    <style>
+        :root {
+            --bg-color: #050508;
+            --panel-bg: #0c0d14;
+            --text-color: #ffffff;
+            --text-muted: #8a8d9a;
+            --accent-blue: #0072ff;
+            --accent-green: #00e676;
+            --accent-yellow: #ffd600;
+            --border-color: #1e2235;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-size: 14px;
+            line-height: 1.5;
+            padding: 20px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+
+        .logo-area h1 {
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .logo-area span {
+            color: var(--text-muted);
+            font-size: 11px;
+            font-family: monospace;
+        }
+
+        .system-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: monospace;
+            font-size: 12px;
+            background: rgba(0, 230, 118, 0.1);
+            padding: 4px 10px;
+            border-radius: 4px;
+            border: 1px solid var(--accent-green);
+            color: var(--accent-green);
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 900px) {
+            .grid-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .panel {
+            background-color: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 20px;
+        }
+
+        .panel h2 {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+        }
+
+        .meta-list {
+            list-style: none;
+            font-family: monospace;
+        }
+
+        .meta-list li {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px dashed var(--border-color);
+        }
+
+        .meta-list li:last-child {
+            border-bottom: none;
+        }
+
+        .meta-list .label {
+            color: var(--text-muted);
+        }
+
+        .meta-list .value {
+            color: var(--text-color);
+            font-weight: bold;
+        }
+
+        .ci-counter {
+            font-size: 24px;
+            font-weight: bold;
+            font-family: monospace;
+            color: var(--accent-blue);
+            margin: 10px 0;
+        }
+
+        .reper-card {
+            background: rgba(30, 34, 53, 0.3);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 12px;
+            margin-bottom: 12px;
+        }
+
+        .reper-header {
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            font-family: monospace;
+            margin-bottom: 6px;
+        }
+
+        .reper-status-active { color: var(--accent-blue); }
+        .reper-status-warning { color: var(--accent-yellow); }
+
+        .progress-bar-bg {
+            background: var(--border-color);
+            height: 6px;
+            border-radius: 3px;
+            width: 100%;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: var(--accent-blue);
+        }
+
+        .terminal-log {
+            background-color: #020204;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 12px;
+            font-family: monospace;
+            font-size: 12px;
+            color: #00ff66;
+            height: 180px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo-area">
+            <h1>Planetary Institute</h1>
+            <span>Node Core Control Platform v0.1-alpha</span>
+        </div>
+        <div class="system-status">
+            <span>NETWORK SYSTEM: ONLINE</span>
+        </div>
+    </header>
+
+    <div class="grid-container">
+        <!-- Левая колонка: Статус Ноды -->
+        <div class="space-column">
+            <div class="panel" style="margin-bottom: 20px;">
+                <h2>Спецификация Узла</h2>
+                <ul class="meta-list">
+                    <li><span class="label">Идентификатор (ZK-ID)</span><span class="value" style="color:var(--accent-blue);">PI-883-ALPHA</span></li>
+                    <li><span class="label">Тип сети</span><span class="value">Web4 P2P (Hydra)</span></li>
+                    <li><span class="label">Активные пиры (Сварм)</span><span class="value">142 nodes</span></li>
+                    <li><span class="label">Выделенная память</span><span class="value">2.0 GB</span></li>
+                </ul>
+            </div>
+
+            <div class="panel">
+                <h2>Вклад в систему</h2>
+                <div class="label">Contribution Index (CI)</div>
+                <div class="ci-counter" id="ci-display">0.000000</div>
+                <div style="font-size: 11px; color: var(--text-muted); font-family: monospace;">Скорость начисления: +0.000100 CI/сек</div>
+            </div>
+        </div>
+
+        <!-- Правая колонка: Мониторинг Реперов и Вычислений -->
+        <div class="main-column">
+            <div class="panel" style="margin-bottom: 20px;">
+                <h2>Текущие глобальные реперы в обработке</h2>
+                
+                <div class="reper-card">
+                    <div class="reper-header">
+                        <span>РЕПЕР 1: Агро-Экологический контур (Почва)</span>
+                        <span class="reper-status-active">АКТИВЕН</span>
+                    </div>
+                    <div style="font-size: 12px; color: var(--text-muted);">Расчет биомиметического контура регенерации гумусового слоя.</div>
+                    <div class="progress-bar-bg"><div class="progress-bar-fill" style="width: 33%;"></div></div>
+                </div>
+
+                <div class="reper-card">
+                    <div class="reper-header">
+                        <span>РЕПЕР 2: Энергетический контур (Хранение энергии)</span>
+                        <span class="reper-status-active">АКТИВЕН</span>
+                    </div>
+                    <div style="font-size: 12px; color: var(--text-muted);">Моделирование структуры не-литиевых молекулярных решеток (Na-Ion).</div>
+                    <div class="progress-bar-bg"><div class="progress-bar-fill" style="width: 14%;"></div></div>
+                </div>
+
+                <div class="reper-card">
+                    <div class="reper-header">
+                        <span>РЕПЕР 3: Гидро-Океанический контур (Микропластик)</span>
+                        <span class="reper-status-warning">КАЛИБРОВКА</span>
+                    </div>
+                    <div style="font-size: 12px; color: var(--text-muted);">Анализ тождественности уравнений Навье-Стокса процессам биофильтрации.</div>
+                    <div class="progress-bar-bg"><div class="progress-bar-fill" style="width: 5%; background: var(--accent-yellow);"></div></div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h2>Журнал вычислений ядра ИИ (AI-Core Log)</h2>
+                <div class="terminal-log" id="log-display">Initializing node kernel...
+Post-quantum cryptographic key loaded.
+Connection established with global swarm.
+AI-Core: loaded requirements.txt constraints.
+Core Filter: validation loop active...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Демонстрационный скрипт симуляции динамики начисления CI и логов
+        let ci = 0.000000;
+        const ciDisplay = document.getElementById('ci-display');
+        const logDisplay = document.getElementById('log-display');
+
+        setInterval(() => {
+            ci += 0.000100;
+            ciDisplay.innerText = ci.toFixed(6);
+        }, 1000);
+
+        const mockLogs = [
+            "AI-Core: Проект #7409 распределен в категории [Органическая химия], [Микробиология].",
+            "P2P-Engine: Синхронизировано 4 новых шарда Базы Открытий.",
+            "AI-Core: Обнаружена междисциплинарная тождественность в уравнениях фильтрации.",
+            "Proof-of-Science: Вычислительный блок для Репера 2 успешно проверен и отправлен в сеть."
+        ];
+
+        setInterval(() => {
+            const randomLog = mockLogs[Math.floor(Math.random() * mockLogs.length)];
+            logDisplay.innerText += `\n[${new Date().toLocaleTimeString()}] ${randomLog}`;
+            logDisplay.scrollTop = logDisplay.scrollHeight;
+        }, 5000);
+    </script>
+</body>
+</html>
