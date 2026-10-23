@@ -16,7 +16,7 @@ RUN apk update && apk add --no-cache \
     ca-certificates
 
 # Создание изолированных директорий для зашифрованной Базы Открытий и приложения
-RUN mkdir -p /data/pi/db /data/pi/node_config /app /app/scripts /app/ai_core
+RUN mkdir -p /data/pi/db /data/pi/node_config /app /app/scripts /app/ai_core /app/app
 
 # Установка рабочей директории
 WORKDIR /app
@@ -32,20 +32,28 @@ COPY --chown=pi_operator:pi_operator ai_core/requirements.txt /app/ai_core/requi
 # Установка Python-зависимостей ядра ИИ
 RUN pip3 install --no-cache-dir --break-system-packages -r /app/ai_core/requirements.txt
 
+# Копируем файлы интерфейса и API шлюза
+COPY --chown=pi_operator:pi_operator app/index.html /app/app/index.html
+COPY --chown=pi_operator:pi_operator app/api.py /app/app/api.py
+
 # Копируем скрипт приветствия в изолированную директорию контейнера
 COPY --chown=pi_operator:pi_operator scripts/welcome_msg.sh /app/scripts/welcome_msg.sh
 
-# Делаем скрипт приветствия исполняемым
-RUN chmod +x /app/scripts/welcome_msg.sh
+# Делаем скрипты исполняемыми
+RUN chmod +x /app/scripts/welcome_msg.sh && chmod +x /app/app/api.py
 
 USER pi_operator
 
 # Инициализация локального узла распределенной P2P-сети IPFS в энергосберегающем режиме
 RUN ipfs init --profile low-power
 
-# Открытие сетевых портов: 4001 (P2P-трафик протокола Гидра), 8080 (Локальный веб-интерфейс)
+# Открытие сетевых портов: 4001 (P2P-трафик протокола Гидра), 8080 (Локальный веб-интерфейс и API)
 EXPOSE 4001
 EXPOSE 8080
+
+# Финальная точка входа: запуск приветствия Павла и ИИ, старт IPFS-демона в фоне и запуск API-шлюза
+ENTRYPOINT ["/bin/bash", "-c", "/app/scripts/welcome_msg.sh && ipfs daemon --migrate=true & python3 /app/app/api.py"]
+
 
 # Точка входа: запуск приветственного сообщения ИИ и Павла, затем старт P2P-демона
 ENTRYPOINT ["/bin/bash", "-c", "/app/scripts/welcome_msg.sh && ipfs daemon --migrate=true"]
