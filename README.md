@@ -1,5 +1,4 @@
-# planetary-node
-The decentralized core engine of the Planetary Institute. A post-quantum Web4 P2P node combining independent science, automated interdisciplinary AI filtering, and adaptive eco-system management via global indicators (repers). Free from political and corporate influence.
+
 # planetary-node (Планетарный узел)
 
 Децентрализованный основной механизм Планетарного института. Постквантовый P2P-узел Web4, объединяющий независимую науку, автоматизированную междисциплинарную фильтрацию с помощью ИИ и адаптивное управление экосистемой с помощью глобальных индикаторов (реперов). Свободен от политического и корпоративного влияния.
